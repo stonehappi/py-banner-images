@@ -16,26 +16,24 @@ def add_logo_right(logo_path: str, image: Image, height: int, banner_height: int
     logo = Image.open(logo_path).convert('RGBA')
     new_width = (logo.width * draw_height) // logo.height
     logo = logo.resize((new_width, draw_height))
-    image.paste(logo, (right - logo.width - padding, height - logo.height - padding))
-    return right - logo.width - padding
+    image.paste(logo, (right - logo.width - padding * 2, height - logo.height - padding))
+    return right - logo.width - padding * 2
 
 
 def add_bottom_banner(image_path, output_folder):
     # Open the image
     image = Image.open(image_path)
 
-    # Get the size of the image
     width, height = image.size
     ratio = width / height if width > height else height / width
-    # Define the banner size and color
     banner_height = int(height * 0.12 / ratio)
     padding = int(banner_height * 0.1)
-    image = add_background(image, banner_height, 200)
+    # image = add_background(image, banner_height, 200, padding)
     left = 0
     logos = ['logo/rupp.png', 'logo/sca.png', 'logo/fe.png']
     for logo in logos:
         left = add_logo_left(logo, image, height, banner_height, left, padding)
-    image = add_background(image, banner_height, left)
+    image = add_background(image, banner_height, left, padding)
     left = 0
     for logo in logos:
         left = add_logo_left(logo, image, height, banner_height, left, padding)
@@ -53,23 +51,46 @@ def add_bottom_banner(image_path, output_folder):
     image.save(output_path)
 
 
-def add_background(image: Image, banner_height: int, left: int) -> Image:
+def add_background(image: Image, banner_height: int, left: int, padding: int) -> Image:
     bg = Image.new("RGBA", (image.width, banner_height), (21, 55, 83))
     draw = ImageDraw.Draw(bg)
     bg_color = (255, 255, 255)
     draw.polygon([(0, 0), (left, 0), (left + banner_height, banner_height), (0, banner_height)], fill=bg_color)
+    start_x = left + padding * 2
+    start_y = padding * 2
+    points = [
+        (start_x, start_y),
+        (start_x + padding * 1.5, start_y),
+        (start_x + banner_height - padding, banner_height - padding * 0.5),
+        (image.width, banner_height - padding * 0.5),
+        (image.width, banner_height),
+        (start_x + banner_height - padding, banner_height),
+        (start_x + padding * 1.5, start_y + padding * 0.5),
+        (start_x + padding * 0.5, start_y + padding * 0.5),
+    ]
+    draw.polygon(points, fill='white')
+
+    start_x = left + padding
+    start_y = padding * 0.5
+    points = [
+        (start_x, start_y),
+        (start_x + padding, start_y),
+        (start_x + padding * 2, start_y + padding),
+        (start_x + padding, start_y + padding),
+    ]
+    draw.polygon(points, fill=(221, 71, 63))
     image.paste(bg, (0, image.height - banner_height))
     return image
 
 
-input_folder = 'input'
-output_folder = 'output'
+input_folder = '/Users/stone-wh/Desktop/input'
+output_folder = '/Users/stone-wh/Desktop/output'
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 for filename in os.listdir(input_folder):
-    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):  # Add more extensions as needed
+    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
         print(f"Processing {filename}...")
         image_path = os.path.join(input_folder, filename)
         add_bottom_banner(image_path, output_folder)
