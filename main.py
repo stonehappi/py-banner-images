@@ -28,7 +28,6 @@ def add_bottom_banner(image_path, output_folder):
     ratio = width / height if width > height else height / width
     banner_height = int(height * 0.12 / ratio)
     padding = int(banner_height * 0.1)
-    # image = add_background(image, banner_height, 200, padding)
     left = 0
     logos = ['logo/rupp.png', 'logo/sca.png', 'logo/fe.png']
     for logo in logos:
@@ -82,9 +81,9 @@ def add_background(image: Image, banner_height: int, left: int, padding: int) ->
     image.paste(bg, (0, image.height - banner_height))
     return image
 
-
-input_folder = '/Users/stone-wh/Desktop/input'
-output_folder = '/Users/stone-wh/Desktop/output'
+path = '/Users/stone-wh/Library/CloudStorage/OneDrive-RoyalUniversityofPhnomPenh/01 - ASCSE/Student - Seminar & Events/07 - NGS Visit (31Jan2024)'
+input_folder = f'{path}/Original'
+output_folder = f'{path}/Banner'
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
